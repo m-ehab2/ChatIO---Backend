@@ -3,6 +3,7 @@ const app = express();
 const connectToDatabase = require('./config/Database');
 const AppError=require('./utils/AppError')
 const userRoute = require('./routes/userRoute');
+const chatRoute = require('./routes/chatRoute');
 const ErrorHandler = require('./middleware/ErrorHandler');
 require('dotenv').config();
 const cors = require('cors');
@@ -14,6 +15,8 @@ const port = process.env.PORT || 3000;
 const urlDataBase = process.env.DATABASE_URL;
 app.use(express.json())
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/chat", chatRoute);
+
 app.all('*', (req, res, next) => {
     next(new AppError(`Cant find ${req.originalUrl} on this server`, 404))
 })

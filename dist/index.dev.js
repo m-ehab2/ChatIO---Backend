@@ -10,6 +10,8 @@ var AppError = require('./utils/AppError');
 
 var userRoute = require('./routes/userRoute');
 
+var chatRoute = require('./routes/chatRoute');
+
 var ErrorHandler = require('./middleware/ErrorHandler');
 
 require('dotenv').config();
@@ -22,6 +24,7 @@ var port = process.env.PORT || 3000;
 var urlDataBase = process.env.DATABASE_URL;
 app.use(express.json());
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/chat", chatRoute);
 app.all('*', function (req, res, next) {
   next(new AppError("Cant find ".concat(req.originalUrl, " on this server"), 404));
 });
