@@ -267,4 +267,41 @@ exports.addUserToGroup = asyncHandler(function _callee6(req, res, next) {
     }
   });
 });
+exports.deleteUserFromGroup = asyncHandler(function _callee7(req, res, next) {
+  var _req$body3, chatId, userId, chat;
+
+  return regeneratorRuntime.async(function _callee7$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          _req$body3 = req.body, chatId = _req$body3.chatId, userId = _req$body3.userId;
+          _context7.next = 3;
+          return regeneratorRuntime.awrap(Chat.findByIdAndUpdate(chatId, {
+            $pull: {
+              users: userId
+            }
+          }, {
+            runValidators: true,
+            "new": true
+          }).populate('users', '-password').populate('groupAdmin', '-password'));
+
+        case 3:
+          chat = _context7.sent;
+
+          if (!chat) {
+            next(new AppError("chatId or userId not found", 400));
+          }
+
+          res.status(200).json({
+            status: 'success',
+            data: chat
+          });
+
+        case 6:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  });
+});
 //# sourceMappingURL=chatController.dev.js.map

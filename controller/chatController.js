@@ -116,3 +116,19 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
         data:chat
     })
 })
+exports.deleteUserFromGroup = asyncHandler(async (req, res, next) => {
+    const { chatId, userId } = req.body;
+    const chat = await Chat.findByIdAndUpdate(chatId, {
+        $pull: { users: userId }
+    }, {
+        runValidators: true,
+        new: true
+    }).populate('users','-password').populate('groupAdmin','-password');
+    if (!chat) {
+        next(new AppError("chatId or userId not found",400));
+    }
+    res.status(200).json({
+        status: 'success',
+        data:chat
+    })
+})
