@@ -146,4 +146,53 @@ exports.fetchChats = asyncHandler(function _callee3(req, res, next) {
     }
   });
 });
+exports.createGroup = asyncHandler(function _callee4(req, res, next) {
+  var users, chatGroup, group;
+  return regeneratorRuntime.async(function _callee4$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          users = JSON.parse(req.body.users);
+          console.log(users);
+
+          if (!(users.length < 2)) {
+            _context4.next = 4;
+            break;
+          }
+
+          return _context4.abrupt("return", res.status(400).json({
+            status: 'Group should be more than 2'
+          }));
+
+        case 4:
+          users.push(req.user);
+          _context4.next = 7;
+          return regeneratorRuntime.awrap(Chat.create({
+            chatName: req.body.name,
+            users: users,
+            isGroupChat: true,
+            groupAdmin: req.user
+          }));
+
+        case 7:
+          chatGroup = _context4.sent;
+          _context4.next = 10;
+          return regeneratorRuntime.awrap(Chat.findOne({
+            _id: chatGroup._id
+          }).populate('users', '-password').populate('groupAdmin', '-password'));
+
+        case 10:
+          group = _context4.sent;
+          res.status(200).json({
+            status: 'success',
+            data: group
+          });
+
+        case 12:
+        case "end":
+          return _context4.stop();
+      }
+    }
+  });
+});
 //# sourceMappingURL=chatController.dev.js.map

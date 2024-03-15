@@ -60,3 +60,27 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
     console.log(chats)
 
 })
+exports.createGroup = asyncHandler(async (req, res, next) => {
+    const users = JSON.parse(req.body.users);
+    console.log(users);
+    if (users.length < 2) {
+        return res.status(400).json({
+            status: 'Group should be more than 2',
+        })
+    }
+    users.push(req.user);
+        const chatGroup = await Chat.create({
+        chatName: req.body.name,
+        users,
+            isGroupChat: true,
+        groupAdmin:req.user
+        })
+    const group = await Chat.findOne({ _id: chatGroup._id })
+        .populate('users', '-password')
+        .populate('groupAdmin','-password')
+
+    res.status(200).json({
+        status: 'success',
+        data:group
+    })
+})
