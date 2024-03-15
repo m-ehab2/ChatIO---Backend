@@ -9,15 +9,32 @@ var AppError = require('../utils/AppError');
 var mongoose = require("mongoose");
 
 exports.getUsers = asyncHandler(function _callee(req, res, next) {
-  var users;
+  var search, users;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _context.next = 2;
-          return regeneratorRuntime.awrap(User.find());
+          search = req.query.search ? {
+            $or: [{
+              name: {
+                $regex: req.query.search,
+                $options: 'i'
+              }
+            }, {
+              email: {
+                $regex: req.query.search,
+                $options: 'i'
+              }
+            }]
+          } : {};
+          _context.next = 3;
+          return regeneratorRuntime.awrap(User.find(search).find({
+            _id: {
+              $ne: req.user._id
+            }
+          }));
 
-        case 2:
+        case 3:
           users = _context.sent;
           res.status(200).json({
             status: "success",
@@ -25,7 +42,7 @@ exports.getUsers = asyncHandler(function _callee(req, res, next) {
             data: users
           });
 
-        case 4:
+        case 5:
         case "end":
           return _context.stop();
       }
@@ -183,7 +200,7 @@ exports.deleteUser = asyncHandler(function _callee5(req, res, next) {
 
         case 8:
           return _context5.abrupt("return", res.status(200).json({
-            status: "succes",
+            status: "success",
             message: "user is deleted"
           }));
 
