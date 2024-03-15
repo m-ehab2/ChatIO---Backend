@@ -26,6 +26,11 @@
                         message:"the password not the same"       
             }
         },
+        image: {
+            type: String,
+            default:'https://yourteachingmentor.com/wp-content/uploads/2020/12/istockphoto-1223671392-612x612-1.jpg'
+        }
+        ,
         passwordChangedAt: Date,
     }, {
         timestamps: true,

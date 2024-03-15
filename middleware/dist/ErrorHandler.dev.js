@@ -3,6 +3,8 @@
 var AppError = require("../utils/AppError");
 
 var ErrorHandler = function ErrorHandler(err, req, res, next) {
+  console.log("error ", err);
+
   if (err instanceof AppError) {
     console.log(err);
     console.log(AppError);
