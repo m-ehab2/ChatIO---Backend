@@ -230,4 +230,41 @@ exports.renameGroup = asyncHandler(function _callee5(req, res, next) {
     }
   });
 });
+exports.addUserToGroup = asyncHandler(function _callee6(req, res, next) {
+  var _req$body2, chatId, userId, chat;
+
+  return regeneratorRuntime.async(function _callee6$(_context6) {
+    while (1) {
+      switch (_context6.prev = _context6.next) {
+        case 0:
+          _req$body2 = req.body, chatId = _req$body2.chatId, userId = _req$body2.userId;
+          _context6.next = 3;
+          return regeneratorRuntime.awrap(Chat.findByIdAndUpdate(chatId, {
+            $push: {
+              users: userId
+            }
+          }, {
+            runValidators: true,
+            "new": true
+          }).populate('users', '-password').populate('groupAdmin', '-password'));
+
+        case 3:
+          chat = _context6.sent;
+
+          if (!chat) {
+            next(new AppError("chatId or userId not found", 400));
+          }
+
+          res.status(200).json({
+            status: 'success',
+            data: chat
+          });
+
+        case 6:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  });
+});
 //# sourceMappingURL=chatController.dev.js.map

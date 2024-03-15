@@ -6,4 +6,5 @@ const isAuth = require('../middleware/isAuth');
 router.route('/').post(isAuth,chatController.accessChat).get(isAuth,chatController.fetchChats);
 router.route('/group').post(isAuth,chatController.createGroup);
 router.route('/group/rename').put(isAuth,chatController.renameGroup);
+router.route('/group/add').put(isAuth,chatController.addUserToGroup);
 module.exports = router;
