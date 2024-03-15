@@ -195,4 +195,39 @@ exports.createGroup = asyncHandler(function _callee4(req, res, next) {
     }
   });
 });
+exports.renameGroup = asyncHandler(function _callee5(req, res, next) {
+  var _req$body, chatId, chatName, newChat;
+
+  return regeneratorRuntime.async(function _callee5$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          _req$body = req.body, chatId = _req$body.chatId, chatName = _req$body.chatName;
+
+          if (!chatId || !chatName) {
+            next(new AppError("you should provide chatId and chatName ", 400));
+          }
+
+          _context5.next = 4;
+          return regeneratorRuntime.awrap(Chat.findByIdAndUpdate(chatId, {
+            chatName: chatName
+          }, {
+            "new": true,
+            runValidators: true
+          }).populate('users', '-password').populate('groupAdmin', '-password'));
+
+        case 4:
+          newChat = _context5.sent;
+          res.status(200).json({
+            status: 'success',
+            data: newChat
+          });
+
+        case 6:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  });
+});
 //# sourceMappingURL=chatController.dev.js.map

@@ -84,3 +84,19 @@ exports.createGroup = asyncHandler(async (req, res, next) => {
         data:group
     })
 })
+exports.renameGroup = asyncHandler(async (req, res, next) => {
+    const { chatId, chatName } = req.body;
+    if (!chatId || !chatName) {
+        next(new AppError("you should provide chatId and chatName ",400))
+    }
+    const newChat = await Chat.findByIdAndUpdate(chatId,{
+        chatName
+    }, {
+        new: true,
+        runValidators:true
+    }).populate('users','-password').populate('groupAdmin','-password');
+    res.status(200).json({
+        status: 'success',
+        data:newChat
+    })
+})

@@ -7,6 +7,6 @@ router.route('/login').post(authController.login)
 
 router.route('/').get(isAuth,userController.getUsers).post(userController.createUser)
 router.route("/:id").patch(userController.updateUser)
-    .delete(userController.deleteUser)
+    .delete(isAuth,userController.deleteUser)
     .get(userController.getOneUser)
 module.exports=router

@@ -200,7 +200,7 @@ exports.deleteUser = asyncHandler(function _callee5(req, res, next) {
 
         case 8:
           return _context5.abrupt("return", res.status(200).json({
-            status: "succes",
+            status: "success",
             message: "user is deleted"
           }));
 

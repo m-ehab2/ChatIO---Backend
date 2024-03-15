@@ -73,7 +73,7 @@ exports.deleteUser = asyncHandler(async (req,res,next) => {
 
     }
     return res.status(200).json({
-            status: "succes",
+            status: "success",
             message:"user is deleted"
         })
 })
