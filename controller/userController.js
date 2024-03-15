@@ -4,7 +4,14 @@ const AppError=require('../utils/AppError');
 const mongoose = require("mongoose");
     
 exports.getUsers = asyncHandler(async (req, res, next) => {
-    const users = await User.find();
+    const search = req.query.search ? {
+        $or:[
+            { name: { $regex: req.query.search, $options: 'i' } },
+            { email: { $regex: req.query.search, $options: 'i' } }
+        ],
+    }: {};
+
+    const users = await User.find(search).find({_id:{$ne:req.user._id}});
     res.status(200).json({
         status: "success",
         result: users.length,

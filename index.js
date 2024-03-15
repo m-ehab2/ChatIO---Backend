@@ -1,4 +1,3 @@
-
 const express=require('express')
 const app = express();
 const connectToDatabase = require('./config/Database');
@@ -15,10 +14,10 @@ const port = process.env.PORT || 3000;
 const urlDataBase = process.env.DATABASE_URL;
 app.use(express.json())
 app.use("/api/v1/user", userRoute);
-app.use(ErrorHandler)
 app.all('*', (req, res, next) => {
     next(new AppError(`Cant find ${req.originalUrl} on this server`, 404))
 })
+app.use(ErrorHandler)
 
 
 connectToDatabase(urlDataBase)

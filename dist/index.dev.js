@@ -22,10 +22,10 @@ var port = process.env.PORT || 3000;
 var urlDataBase = process.env.DATABASE_URL;
 app.use(express.json());
 app.use("/api/v1/user", userRoute);
-app.use(ErrorHandler);
 app.all('*', function (req, res, next) {
   next(new AppError("Cant find ".concat(req.originalUrl, " on this server"), 404));
 });
+app.use(ErrorHandler);
 connectToDatabase(urlDataBase);
 app.listen(port, function () {
   console.log("localhost:", port);
