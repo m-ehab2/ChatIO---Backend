@@ -40,3 +40,23 @@ exports.accessChat = asyncHandler(async (req, res, next) => {
         })
     }
 })
+exports.fetchChats = asyncHandler(async (req, res, next) => {
+         await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+        .populate('users', "-password")
+        .populate('groupAdmin', '-password')
+        .populate('message')
+        .sort({ updatedAt: -1 }).
+        then(async(results) => {
+            results=await User.populate(results, {
+                path: 'message.sender',
+                select:'name image email'
+            })
+            res.status(200).json({
+                status: "success",
+                data:results
+            })
+        })
+    next(new AppError('not found any chats for that user',400))
+    console.log(chats)
+
+})

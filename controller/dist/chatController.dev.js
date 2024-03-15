@@ -95,4 +95,55 @@ exports.accessChat = asyncHandler(function _callee(req, res, next) {
     }
   });
 });
+exports.fetchChats = asyncHandler(function _callee3(req, res, next) {
+  return regeneratorRuntime.async(function _callee3$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.next = 2;
+          return regeneratorRuntime.awrap(Chat.find({
+            users: {
+              $elemMatch: {
+                $eq: req.user._id
+              }
+            }
+          }).populate('users', "-password").populate('groupAdmin', '-password').populate('message').sort({
+            updatedAt: -1
+          }).then(function _callee2(results) {
+            return regeneratorRuntime.async(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    _context2.next = 2;
+                    return regeneratorRuntime.awrap(User.populate(results, {
+                      path: 'message.sender',
+                      select: 'name image email'
+                    }));
+
+                  case 2:
+                    results = _context2.sent;
+                    res.status(200).json({
+                      status: "success",
+                      data: results
+                    });
+
+                  case 4:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            });
+          }));
+
+        case 2:
+          next(new AppError('not found any chats for that user', 400));
+          console.log(chats);
+
+        case 4:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  });
+});
 //# sourceMappingURL=chatController.dev.js.map
