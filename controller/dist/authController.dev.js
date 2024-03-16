@@ -26,16 +26,14 @@ exports.signup = asyncHandler(function _callee(req, res, next) {
 
         case 2:
           user = _context.sent;
-          console.log("hello");
-          token = createToken(user._id);
-          console.log("token ", token);
+          token = createToken(user._id, req, res);
           res.status(201).json({
             status: 'success',
             token: token,
             data: user
           });
 
-        case 7:
+        case 5:
         case "end":
           return _context.stop();
       }
@@ -84,7 +82,7 @@ exports.login = asyncHandler(function _callee2(req, res, next) {
           next(new AppError(" Incorrect email or password", 401));
 
         case 12:
-          token = createToken(user._id);
+          token = createToken(user._id, req, res);
           res.status(200).json({
             status: "success",
             token: token

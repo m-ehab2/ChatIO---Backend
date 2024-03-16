@@ -4,7 +4,6 @@ const Chat = require('../models/chat');
 const User = require('../models/user');
 const AppError = require('../utils/AppError');
 exports.accessChat = asyncHandler(async (req, res, next) => {
-    console.log("in chat")
     const { userId } = req.body;
     let chatData = await Chat.find({
         $and: [
