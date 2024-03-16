@@ -5,11 +5,13 @@ const {promisify}=require('util');
 const User = require('../models/user');
 const { getUsers } = require('../controller/userController');
 const isAuth = asyncHandler(async (req, res, next) => {
-    console.log("i")
-    console.log(req.headers.authorization)
+    
     let token 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
          token = req.headers.authorization.split(' ')[1];
+    }
+    else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
     }
     
     if (!token) {

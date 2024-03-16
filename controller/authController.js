@@ -10,9 +10,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     });
-    console.log("hello")
-    const token = createToken(user._id);
-    console.log("token ",token)
+    const token = createToken(user._id,req, res);
     res.status(201).json({
         status: 'success',
         token,
@@ -28,7 +26,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     if (!user || !(await user.correctPassword(password,user.password))) {
          next(new AppError(" Incorrect email or password", 401));
     }
-    const token = createToken(user._id);
+    const token = createToken(user._id,req, res);
     res.status(200).json({
         status: "success",
         token
