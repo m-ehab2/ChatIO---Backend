@@ -1,16 +1,16 @@
 const express = require('express')
 const app = express();
 const connectToDatabase = require('./config/Database');
-const AppError = require('./utils/AppError')
-const userRoute = require('./routes/userRoute');
-const chatRoute = require('./routes/chatRoute');
-const messageRoute = require('./routes/messageRoute');
-const ErrorHandler = require('./middleware/ErrorHandler');
+const userRoute = require('./routes/user');
+const chatRoute = require('./routes/chat');
+const authRoute = require('./routes/auth');
+const messageRoute = require('./routes/message');
+const ErrorHandler = require('./middlewares/ErrorHandler');
 const cookieParser = require('cookie-parser')
 require('dotenv').config();
 const cors = require('cors');
-
-
+const NotFound = require('./errors/NotFound');
+const endPointStartWith='/api/v1'
 app.use(express.json())
 app.use(
     cors({
@@ -25,13 +25,14 @@ const urlDataBase = process.env.DATABASE_URL;
 app.use(express.json({ limit: '10kb' }));
 
 app.use(cookieParser());
-app.use("/api/v1/user", userRoute);
-app.use("/api/v1/chat", chatRoute);
-app.use("/api/v1/message", messageRoute);
+app.use(`${endPointStartWith}/auth`, authRoute);
+app.use(`${endPointStartWith}/user`, userRoute);
+app.use(`${endPointStartWith}/chat`, chatRoute);
+app.use(`${endPointStartWith}/message`, messageRoute);
 
 
 app.all('*', (req, res, next) => {
-    next(new AppError(`Cant find ${req.originalUrl} on this server`, 404))
+    next(new NotFound(`Cant find ${req.originalUrl} on this server`, 404))
 })
 app.use(ErrorHandler)
 
