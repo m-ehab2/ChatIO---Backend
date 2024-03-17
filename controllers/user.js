@@ -1,6 +1,5 @@
 const User = require("../models/user");
 const asyncHandler = require('express-async-handler');
-const AppError=require('../errors/AppError');
 const mongoose = require("mongoose");
     
 exports.getUsers = asyncHandler(async (req, res, next) => {

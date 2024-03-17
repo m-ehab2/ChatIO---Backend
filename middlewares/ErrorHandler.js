@@ -1,4 +1,3 @@
-const AppError = require("../errors/AppError");
 const BadRequest = require("../errors/BadRequest");
 const NotFound = require("../errors/NotFound");
 const UnauthorizedError = require("../errors/unAuthorized");
