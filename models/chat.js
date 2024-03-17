@@ -15,10 +15,6 @@ const ChatSchema = mongoose.Schema({
             ref: 'User',
         },
     ],
-    message: {
-        type: String,
-        ref:'Message'
-    }
 }, {
     timestamps: true,
     toJSON:{virtuals:true},
