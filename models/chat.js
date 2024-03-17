@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const ChatSchema = mongoose.Schema({
-    isGroupChat: {
-        type: Boolean,
-        default:false
-    },
+    
     chatName: {
         type:String
     },
@@ -23,7 +20,13 @@ const ChatSchema = mongoose.Schema({
         ref:'Message'
     }
 }, {
-    timestamps:true
+    timestamps: true,
+    toJSON:{virtuals:true},
+    toObject:{virtuals:true},
+})
+    
+ChatSchema.virtual("isGroup").get(function () {
+    return this.users > 2;
 })
 
 const Chat = mongoose.model('Chat', ChatSchema);
