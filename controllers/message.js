@@ -13,9 +13,7 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
     newMessage = await Message.populate(newMessage,{ path: 'sender', select: 'name image' })
     newMessage = await Message.populate(newMessage, { path: 'chat' })
     newMessage = await User.populate(newMessage, { path: 'chat.users', select: 'name image email' })
-    await Chat.findByIdAndUpdate(chatId, {
-       message: newMessage._id
-    })
+  
 
     res.status(201).json({
         status: "success",
