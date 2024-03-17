@@ -70,7 +70,6 @@ exports.createGroup = asyncHandler(async (req, res, next) => {
         const chatGroup = await Chat.create({
         chatName: req.body.name,
         users,
-            isGroupChat: true,
         groupAdmin:req.user
         })
     const group = await Chat.findOne({ _id: chatGroup._id })
@@ -87,6 +86,10 @@ exports.renameGroup = asyncHandler(async (req, res, next) => {
     if (!chatId || !chatName) {
         next(new BadRequest("you should provide chatId and chatName ",400))
     }
+    const chat = await Chat.findById(chatId);
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+        next(new BadRequest('you not admin to rename chatname',400))
+    }
     const newChat = await Chat.findByIdAndUpdate(chatId,{
         chatName
     }, {
@@ -100,33 +103,47 @@ exports.renameGroup = asyncHandler(async (req, res, next) => {
 })
 exports.addUserToGroup = asyncHandler(async (req, res, next) => {
     const { chatId, userId } = req.body;
-    const chat = await Chat.findByIdAndUpdate(chatId, {
+    if (!chatId || !userId) {
+        next(new BadRequest("you should provide chatId and userId ",400))
+    }
+    const chat = await Chat.findById(chatId);
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+        next(new BadRequest('you not admin to add user to group',400))
+    }
+    const newChat = await Chat.findByIdAndUpdate(chatId, {
         $push: { users: userId }
     }, {
         runValidators: true,
         new: true
     }).populate('users','-password').populate('groupAdmin','-password');
-    if (!chat) {
+    if (!newChat) {
         next(new BadRequest("chatId or userId not found",400));
     }
     res.status(200).json({
         status: 'success',
-        data:chat
+        data:newChat
     })
 })
 exports.deleteUserFromGroup = asyncHandler(async (req, res, next) => {
     const { chatId, userId } = req.body;
-    const chat = await Chat.findByIdAndUpdate(chatId, {
+    if (!chatId || !userId) {
+        next(new BadRequest("you should provide chatId and userId ",400))
+    }
+    const chat = await Chat.findById(chatId);
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+        next(new BadRequest('you not admin to delete user from group',400))
+    }
+    const newChat = await Chat.findByIdAndUpdate(chatId, {
         $pull: { users: userId }
     }, {
         runValidators: true,
         new: true
     }).populate('users','-password').populate('groupAdmin','-password');
-    if (!chat) {
+    if (!newChat) {
         next(new BadRequest("chatId or userId not found",400));
     }
     res.status(200).json({
         status: 'success',
-        data:chat
+        data:newChat
     })
 })
