@@ -3,7 +3,8 @@ const router = require('express').Router();
 const chatController = require('../controllers/chat');
 const isAuth = require('../middlewares/isAuth');
 router.use(isAuth);
-router.route('/').post(chatController.accessChat).get(chatController.fetchChats);
+router.route('/').post(chatController.accessChat).get(chatController.fetchChats)
+router.route('/chatId').get(chatController.accessChatByChatId)
 router.route('/group').post(chatController.createGroup);
 router.route('/group/rename').put(chatController.renameGroup);
 router.route('/group/add').put(chatController.addUserToGroup);

@@ -3,20 +3,35 @@ const asyncHandler = require('express-async-handler');
 const Chat = require('../models/chat');
 const User = require('../models/user');
 const BadRequest = require('../errors/BadRequest');
+const Message = require('../models/message');
+exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
+    const { chatId } = req.body;
+    // let message = await Message.findOne({ $and:[{chat: chatId}, {sender: { $ne: req.user._id }}] }).sort({ createdAt: -1 });
+    let seen = false;
+    let message = await Message.findOne({chat: chatId }).sort({ createdAt: -1 });
+    console.log(message)
+    if (message && (message.sender.toString()!==req.user._id.toString())) {
+        console.log("dsds")
+        message = await Message.updateOne({ _id: message._id }, { seen: true });
+        console.log("newMesage ",message)
+        seen=true
+        }
+        res.status(200).json({
+            status: "success",
+            data:seen 
+        })
+    })
+
 exports.accessChat = asyncHandler(async (req, res, next) => {
-    console.log("in chat")
     const { userId } = req.body;
     let chatData = await Chat.find({
         $and: [
             { users: { $elemMatch: { $eq: req.user._id } } },
             { users: { $elemMatch: { $eq: userId } } },
         ]
-    }).populate("users", "-password").populate('message');
-    chatData = await User.populate(chatData, {
-        path: 'message.sender',
-        select:'name image email'
     })
-    if (chatData.length>0) {      
+    console.log(chatData.length)
+    if (chatData.length > 0) {   
         res.status(200).json({
             status: "success",
             data:chatData[0]
@@ -25,14 +40,13 @@ exports.accessChat = asyncHandler(async (req, res, next) => {
         var newChat = {
             users: [req.user._id, userId],
             chatName: "sender",
-            isGroupChat:false
         }
         const createChat = await Chat.create(newChat);
 
         const fullChat = await Chat.findOne({ _id: createChat._id })
             .populate("users", "-password");
         if (!fullChat) {
-            throw new BadRequest("the chat not exist",400)
+            next(new BadRequest("the chat not exist",400))
         }
         res.status(201).json({
             status: "success",
@@ -41,28 +55,40 @@ exports.accessChat = asyncHandler(async (req, res, next) => {
     }
 })
 exports.fetchChats = asyncHandler(async (req, res, next) => {
-         await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-        .populate('users', "-password")
-        .populate('groupAdmin', '-password')
-        .populate('message')
-        .sort({ updatedAt: -1 }).
-        then(async(results) => {
-            results=await User.populate(results, {
-                path: 'message.sender',
-                select:'name image email'
-            })
+         const chats = await Chat.aggregate([
+         {
+        $match: { users: { $elemMatch: { $eq: req.user._id } } }
+    },
+    {
+        $lookup: {
+            from: 'messages',
+            let: { chatId: '$_id' },
+            pipeline: [
+                { $match: { $expr: { $eq: ['$chat', '$$chatId'] } } },
+                { $sort: { 'createdAt': -1 } },
+                { $limit: 1 }
+            ],
+            as: 'lastMessage'
+        }
+    },
+    {
+        $set: {
+            lastMessage: { $arrayElemAt: ['$lastMessage', 0] }
+        }
+    }
+         ]);
+     for (const chat of chats) {
+        await Message.populate(chat.lastMessage, { path: 'sender', select: 'name image' });
+    }
+
             res.status(200).json({
                 status: "success",
-                data:results
+                data:chats
             })
-        })
-    next(new BadRequest('not found any chats for that user',400))
-    console.log(chats)
-
+        
 })
 exports.createGroup = asyncHandler(async (req, res, next) => {
     const users = JSON.parse(req.body.users);
-    console.log(users);
     if (users.length < 2) {
     next(new BadRequest('Group should be more than 2',400))
     }
