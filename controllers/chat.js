@@ -9,8 +9,8 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
     let messages = await Message.find({ chat: chatId });
        await Promise.all(messages.map(async (message)=> {
         if (message.sender.toString() !== req.user._id.toString()) {
-           return await Message.findByIdAndUpdate(message._id, {
-                $addToSet: { seen: req.user._id }
+            return await Message.findByIdAndUpdate(message._id, {
+                $addToSet: { seen:{ users: req.user._id } }
             }, {
                 new: true,
                 runValidators:true
@@ -18,7 +18,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
         }
         return message   
     }))
-        const newMessages = await Message.find({ chat: chatId }).populate('seen','-password');
+        const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password');
 
         res.status(200).json({
             status: "success",
@@ -28,13 +28,11 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
 
 exports.accessChat = asyncHandler(async (req, res, next) => {
     const { userId } = req.body;
-    const isGroup = req.query.isGroup;
-    console.log(isGroup);
     let chatData = await Chat.find({
-        $and: [
-            { users: { $elemMatch: { $eq: req.user._id } } },
-            { users: { $elemMatch: { $eq: userId } } },
-        ]
+        users: {
+            $size: 2, 
+            $all: [req.user._id, userId]
+        }
     })
     if (chatData.length > 0) {   
         res.status(200).json({
@@ -87,7 +85,13 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
         return chat.users.length > 2 == (isGroupChat === 'true');
     });
      for (const chat of chats) {
-        await Message.populate(chat.lastMessage, { path: 'sender', select: 'name image' });
+         await Message.populate(chat.lastMessage, { path: 'sender', select: 'name image' });
+         const unseenCount = await Message.countDocuments({
+            chat: chat._id,
+            seen: { $ne: req.user._id }
+        });
+
+        chat.unseenMessagesCount = unseenCount;
     }
             res.status(200).json({
                 status: "success",
