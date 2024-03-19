@@ -12,10 +12,14 @@ const MessageSchema = mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref:'Chat'
     },
-    seen: {
-        type: Boolean,
-        default:false
-    }
+    // seen: {
+    //     type: Boolean,
+    //     default:false
+    // },
+    seen: [{
+        type: mongoose.Schema.ObjectId,
+        ref:"User"
+    }]
 }, {
     timestamps:true
 })
