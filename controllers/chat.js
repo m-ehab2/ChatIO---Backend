@@ -6,15 +6,23 @@ const BadRequest = require('../errors/BadRequest');
 const Message = require('../models/message');
 exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
     const { chatId } = req.body;
-    let seen = false;
-    let message = await Message.findOne({chat: chatId }).sort({ createdAt: -1 });
-    if (message && (message.sender.toString()!==req.user._id.toString())) {
-        message = await Message.updateOne({ _id: message._id }, { seen: true });
-        seen=true
+    let messages = await Message.find({ chat: chatId });
+       await Promise.all(messages.map(async (message)=> {
+        if (message.sender.toString() !== req.user._id.toString()) {
+           return await Message.findByIdAndUpdate(message._id, {
+                $addToSet: { seen: req.user._id }
+            }, {
+                new: true,
+                runValidators:true
+           });
         }
+        return message   
+    }))
+        const newMessages = await Message.find({ chat: chatId }).populate('seen','-password');
+
         res.status(200).json({
             status: "success",
-            data:seen 
+            data:newMessages 
         })
     })
 
@@ -137,7 +145,7 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
         next(new BadRequest('you not admin to add user to group',400))
     }
     const newChat = await Chat.findByIdAndUpdate(chatId, {
-        $push: { users: userId }
+        $addToSet: { users: userId }
     }, {
         runValidators: true,
         new: true
