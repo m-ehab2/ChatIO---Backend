@@ -28,8 +28,6 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
 
 exports.accessChat = asyncHandler(async (req, res, next) => {
     const { userId } = req.body;
-    const isGroup = req.query.isGroup;
-    console.log(isGroup);
     let chatData = await Chat.find({
         users: {
             $size: 2, 
