@@ -1,6 +1,6 @@
 const BadRequest = require("../errors/BadRequest");
 const NotFound = require("../errors/NotFound");
-const UnauthorizedError = require("../errors/unAuthorized");
+const UnauthorizedError = require("../errors/Unauthorized");
 
 const ErrorHandler = (err, req, res, next) => {
     switch (true) {
