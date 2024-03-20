@@ -57,7 +57,9 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     const uploadImage = await uploadMedia(req.file.path);
     console.log("uploadMedia " ,uploadImage)
     const newUser = await User.findByIdAndUpdate(id, {
-        name:req.body.name,
+        name: req.body.name,
+        status: req.body.status,
+        email: req.body.email,
         image: uploadImage.secure_url
     },
     {
