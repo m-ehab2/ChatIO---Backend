@@ -15,7 +15,8 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+  if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')||
+    file.mimetype.startsWith('audio/')) {
     cb(null, true); 
   } else {
     cb(new Error('File type not supported. Only images and videos are allowed.'), false); // Reject the file

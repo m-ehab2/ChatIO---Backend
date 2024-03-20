@@ -2,12 +2,18 @@ const asyncHandler = require('express-async-handler');
 const Message = require('../models/message');
 const User = require('../models/user');
 const Chat = require('../models/chat');
+const uploadMedia = require('../utils/uploadMedia');
 
 exports.sendMessage = asyncHandler(async (req, res, next) => {
     const { content, chatId } = req.body;
+    let MediaUrl;
+    if (req.file?.path) {
+         MediaUrl =await uploadMedia(req.file.path);
+    }
     let newMessage = await Message.create({
         sender: req.user.id,
         content,
+        media:MediaUrl?.secure_url,
         chat: chatId
     })
     newMessage = await Message.populate(newMessage,{ path: 'sender', select: 'name image' })

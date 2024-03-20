@@ -47,7 +47,6 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 })
 exports.updateUser = asyncHandler(async (req, res, next) => {
     const id = req.params.id;
-    console.log("sdsdsd")
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return next(new AppError("Invalid user ID format", 400));
     }
