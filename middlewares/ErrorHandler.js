@@ -47,6 +47,7 @@ const ErrorHandler = (err, req, res, next) => {
                 message: `Cannot find ${req.originalUrl} on this server.`,
             });
         default:
+            console.log(err)
             return res.status(500).json({
                 status: 'error',
                 message: 'Internal server error.',

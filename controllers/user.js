@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const asyncHandler = require('express-async-handler');
 const mongoose = require("mongoose");
+const uploadMedia = require("../utils/uploadMedia");
 
 exports.getUsers = asyncHandler(async (req, res, next) => {
     const search = req.query.search ? {
@@ -53,10 +54,16 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     if (!user) {
         return next(new AppError("user not found", 404))
     }
-    const newUser = await User.findByIdAndUpdate(id, req.body, {
+    const uploadImage = await uploadMedia(req.file.path);
+    console.log("uploadMedia " ,uploadImage)
+    const newUser = await User.findByIdAndUpdate(id, {
+        name:req.body.name,
+        image: uploadImage.secure_url
+    },
+    {
         runValidators: true,
         new: true
-    });
+        });    
     const status = await User.findByIdAndUpdate(id, { status: req.body.status }, {
         new: true,
         runValidators: true

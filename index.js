@@ -7,7 +7,7 @@ const authRoute = require('./routes/auth');
 const messageRoute = require('./routes/message');
 const ErrorHandler = require('./middlewares/ErrorHandler');
 const cookieParser = require('cookie-parser')
-require('dotenv').config();
+require('dotenv').config()
 const cors = require('cors');
 const NotFound = require('./errors/NotFound');
 const endPointStartWith='/api/v1'
