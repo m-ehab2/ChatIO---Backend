@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const asyncHandler = require('express-async-handler');
 const mongoose = require("mongoose");
+const uploadMedia = require("../utils/uploadMedia");
 
 exports.getUsers = asyncHandler(async (req, res, next) => {
     const search = req.query.search ? {
@@ -46,6 +47,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 })
 exports.updateUser = asyncHandler(async (req, res, next) => {
     const id = req.params.id;
+    console.log("sdsdsd")
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return next(new AppError("Invalid user ID format", 400));
     }
@@ -53,14 +55,18 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     if (!user) {
         return next(new AppError("user not found", 404))
     }
-    const newUser = await User.findByIdAndUpdate(id, req.body, {
+    const imageUrl =await uploadMedia(req.file.path);
+    console.log(imageUrl.secure_url)
+    const newUser = await User.findByIdAndUpdate(id, {
+        name: req.body.name,
+        status: req.body.status,
+        image: imageUrl.secure_url
+    }, {
         runValidators: true,
         new: true
     });
-    const status = await User.findByIdAndUpdate(id, { status: req.body.status }, {
-        new: true,
-        runValidators: true
-    });
+        console.log("imageUrl.secure_url ")
+
     res.status(200).json({
         status: 'success',
         data: newUser
