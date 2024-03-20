@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const jwt=require('jsonwebtoken')
 const {promisify}=require('util');
 const User = require('../models/user');
-const UnauthorizedError = require('../errors/unAuthorized');
+const UnauthorizedError = require('../errors/Unauthorized');
 const isAuth = asyncHandler(async (req, res, next) => {
     
     let token 

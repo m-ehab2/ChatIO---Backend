@@ -5,7 +5,7 @@ const User = require('../models/user');
 const BadRequest = require('../errors/BadRequest');
 const Message = require('../models/message');
 exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
-    const { chatId } = req.body;
+    const { chatId } = req.params;
     let messages = await Message.find({ chat: chatId });
        await Promise.all(messages.map(async (message)=> {
         if (message.sender.toString() !== req.user._id.toString()) {
@@ -26,7 +26,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
         })
     })
 
-exports.accessChat = asyncHandler(async (req, res, next) => {
+exports.createChat = asyncHandler(async (req, res, next) => {
     const { userId } = req.body;
     let chatData = await Chat.find({
         users: {
@@ -130,7 +130,8 @@ exports.createGroup = asyncHandler(async (req, res, next) => {
     })
 })
 exports.renameGroup = asyncHandler(async (req, res, next) => {
-    const { chatId, chatName } = req.body;
+    const { chatName } = req.body;
+    const { chatId } = req.params;
     if (!chatId || !chatName) {
         next(new BadRequest("you should provide chatId and chatName ",400))
     }
@@ -150,7 +151,8 @@ exports.renameGroup = asyncHandler(async (req, res, next) => {
     })
 })
 exports.addUserToGroup = asyncHandler(async (req, res, next) => {
-    const { chatId, userId } = req.body;
+    const { userId } = req.body;
+    const { chatId } = req.params;
     if (!chatId || !userId) {
         next(new BadRequest("you should provide chatId and userId ",400))
     }
@@ -173,7 +175,8 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
     })
 })
 exports.deleteUserFromGroup = asyncHandler(async (req, res, next) => {
-    const { chatId, userId } = req.body;
+    const { userId } = req.body;
+    const { chatId } = req.params;
     if (!chatId || !userId) {
         next(new BadRequest("you should provide chatId and userId ",400))
     }
