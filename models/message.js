@@ -6,7 +6,9 @@ const MessageSchema = mongoose.Schema({
     },
     content: {
         type: String,
-        required:true
+    },
+    media: {
+        type:String,   
     },
     chat: {
         type: mongoose.Schema.ObjectId,

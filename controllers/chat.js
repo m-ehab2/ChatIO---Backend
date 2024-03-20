@@ -86,7 +86,7 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
     });
      for (const chat of chats) {
          await Message.populate(chat.lastMessage, { path: 'sender', select: 'name image' });
-         await User.populate(chat, { path: "users", select: "name" });
+         await User.populate(chat, { path: "users", select: "name image" });
          const unseenCount = await Message.countDocuments({
             chat: chat._id,
             seen: { $ne: req.user._id }
@@ -96,13 +96,16 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
     }
     for (const chat of chats) {
         for (const user of chat.users) {   
+            console.log(user)
             if ((user._id.toString() !== req.user._id.toString())&&chat.users.length===2) {
                 chat.chatName = user.name;
+                chat.image = user.image;
             }
         }
     }
             res.status(200).json({
                 status: "success",
+                length:chats.length,
                 data:chats
             })
 })
