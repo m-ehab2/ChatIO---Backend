@@ -1,4 +1,3 @@
-
 const asyncHandler = require('express-async-handler');
 const Chat = require('../models/chat');
 const User = require('../models/user');
@@ -10,7 +9,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
        await Promise.all(messages.map(async (message)=> {
         if (message.sender.toString() !== req.user._id.toString()) {
             return await Message.findByIdAndUpdate(message._id, {
-                $addToSet: { seen:{ users: req.user._id } }
+                $addToSet: { 'seen':{ users: req.user._id } }
             }, {
                 new: true,
                 runValidators:true
@@ -30,6 +29,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
     }
         res.status(200).json({
             status: "success",
+            length:newMessages.length ,
             chatName: chat.chatName,
             chatImage:chat.chatImage,
             data:newMessages 
@@ -99,7 +99,7 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
          await User.populate(chat, { path: "users", select: "name image" });
          const unseenCount = await Message.countDocuments({
             chat: chat._id,
-             seen: { $ne: req.user._id },
+             "seen.users": { $ne: req.user._id },
             sender: { $ne: req.user._id }
         });
 
