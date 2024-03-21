@@ -18,7 +18,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
         }
         return message   
     }))
-        const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password');
+        const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password').populate('sender','name image');
 
         res.status(200).json({
             status: "success",
