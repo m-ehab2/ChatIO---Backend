@@ -19,9 +19,19 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
         return message   
     }))
         const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password').populate('sender','name image');
-
+    const chat = await Chat.findById(chatId).populate('users', 'name image');
+    if (chat.users.length == 2) {
+        for (const user of chat.users) {
+            if (user._id.toString() !== req.user._id.toString()) {
+                chat.chatName = user.name;
+                chat.chatImage = user.image
+            }
+        }
+    }
         res.status(200).json({
             status: "success",
+            chatName: chat.chatName,
+            chatImage:chat.chatImage,
             data:newMessages 
         })
     })
@@ -97,7 +107,6 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
     }
     for (const chat of chats) {
         for (const user of chat.users) {   
-            console.log(user)
             if ((user._id.toString() !== req.user._id.toString())&&chat.users.length===2) {
                 chat.chatName = user.name;
                 chat.image = user.image;
