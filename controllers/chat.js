@@ -89,7 +89,8 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
          await User.populate(chat, { path: "users", select: "name image" });
          const unseenCount = await Message.countDocuments({
             chat: chat._id,
-            seen: { $ne: req.user._id }
+             seen: { $ne: req.user._id },
+            sender: { $ne: req.user._id }
         });
 
         chat.unseenMessagesCount = unseenCount;
@@ -103,6 +104,12 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
             }
         }
     }
+        chats.sort((a, b) => {
+        const createdAtA = a.lastMessage ? new Date(a.lastMessage.createdAt) : new Date(0);
+        const createdAtB = b.lastMessage ? new Date(b.lastMessage.createdAt) : new Date(0);
+        return createdAtB - createdAtA;
+    });
+
             res.status(200).json({
                 status: "success",
                 length:chats.length,
