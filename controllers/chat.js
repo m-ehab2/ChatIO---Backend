@@ -50,9 +50,10 @@ exports.createChat = asyncHandler(async (req, res, next) => {
             data:chatData[0]
         })
     } else {
+        const user = await User.findById(userId);
         var newChat = {
             users: [req.user._id, userId],
-            chatName: "sender",
+            chatName: user.name,
         }
         const createChat = await Chat.create(newChat);
 
