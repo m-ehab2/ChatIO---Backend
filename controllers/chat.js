@@ -103,7 +103,7 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
             sender: { $ne: req.user._id }
         });
 
-        chat.unseenMessagesCount = unseenCount;
+        chat.unseenMessagesCount = Boolean(unseenCount);
     }
     for (const chat of chats) {
         for (const user of chat.users) {   
