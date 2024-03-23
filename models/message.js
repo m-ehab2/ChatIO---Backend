@@ -15,10 +15,10 @@ const MessageSchema = mongoose.Schema({
         ref:'Chat'
     },
     seen: [{
-         users: [{
+         users: {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
-        }],
+        },
         seenAt: {
             type: Date,
             default: Date.now

@@ -25,10 +25,12 @@ exports.login = asyncHandler(async (req, res, next) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
         next(new BadRequest(" Incorrect email or password", 400));
     }
+    user.password=undefined
     const token = createToken(user._id, req, res);
     res.status(200).json({
         status: "success",
-        token
+        token,
+        data:user
     })
 
 })

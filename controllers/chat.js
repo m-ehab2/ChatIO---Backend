@@ -1,4 +1,3 @@
-
 const asyncHandler = require('express-async-handler');
 const Chat = require('../models/chat');
 const User = require('../models/user');
@@ -10,7 +9,7 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
        await Promise.all(messages.map(async (message)=> {
         if (message.sender.toString() !== req.user._id.toString()) {
             return await Message.findByIdAndUpdate(message._id, {
-                $addToSet: { seen:{ users: req.user._id } }
+                $addToSet: { 'seen':{ users: req.user._id } }
             }, {
                 new: true,
                 runValidators:true
@@ -18,10 +17,21 @@ exports.accessChatByChatId = asyncHandler(async (req, res, next) => {
         }
         return message   
     }))
-        const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password');
-
+        const newMessages = await Message.find({ chat: chatId }).populate('seen.users','-password').populate('sender','name image');
+    const chat = await Chat.findById(chatId).populate('users', 'name image');
+    if (chat.users.length == 2) {
+        for (const user of chat.users) {
+            if (user._id.toString() !== req.user._id.toString()) {
+                chat.chatName = user.name;
+                chat.chatImage = user.image
+            }
+        }
+    }
         res.status(200).json({
             status: "success",
+            length:newMessages.length ,
+            chatName: chat.chatName,
+            chatImage:chat.chatImage,
             data:newMessages 
         })
     })
@@ -40,9 +50,10 @@ exports.createChat = asyncHandler(async (req, res, next) => {
             data:chatData[0]
         })
     } else {
+        const user = await User.findById(userId);
         var newChat = {
             users: [req.user._id, userId],
-            chatName: "sender",
+            chatName: user.name,
         }
         const createChat = await Chat.create(newChat);
 
@@ -89,15 +100,14 @@ exports.fetchChats = asyncHandler(async (req, res, next) => {
          await User.populate(chat, { path: "users", select: "name image" });
          const unseenCount = await Message.countDocuments({
             chat: chat._id,
-             seen: { $ne: req.user._id },
+             "seen.users": { $ne: req.user._id },
             sender: { $ne: req.user._id }
         });
 
-        chat.unseenMessagesCount = unseenCount;
+        chat.unseenMessagesCount = Boolean(unseenCount);
     }
     for (const chat of chats) {
         for (const user of chat.users) {   
-            console.log(user)
             if ((user._id.toString() !== req.user._id.toString())&&chat.users.length===2) {
                 chat.chatName = user.name;
                 chat.image = user.image;
